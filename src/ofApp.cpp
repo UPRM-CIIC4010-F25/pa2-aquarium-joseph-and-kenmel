@@ -7,7 +7,10 @@ void ofApp::setup(){
     ofSetBackgroundColor(ofColor::blue);
     backgroundImage.load("background.png");
     backgroundImage.resize(ofGetWindowWidth(), ofGetWindowHeight());
-
+    
+    music.load("background-music.mp3");
+    music.setLoop(true);
+    music.play();
 
     std::shared_ptr<Aquarium> myAquarium;
     std::shared_ptr<PlayerCreature> player;
