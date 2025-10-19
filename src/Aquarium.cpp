@@ -27,7 +27,7 @@ void PlayerCreature::setDirection(float dx, float dy) {
 void PlayerCreature::move() {
     m_x += m_dx * m_speed;
     m_y += m_dy * m_speed;
-    this->bounce();
+    //this->bounce(ofGetWidth(), ofGetHeight());
 }
 
 void PlayerCreature::reduceDamageDebounce() {
@@ -90,7 +90,7 @@ void NPCreature::move() {
     }else {
         this->m_sprite->setFlipped(false);
     }
-    bounce();
+    bounce(ofGetWidth(), ofGetHeight());
 }
 
 void NPCreature::draw() const {
@@ -123,7 +123,7 @@ void BiggerFish::move() {
         this->m_sprite->setFlipped(false);
     }
 
-    bounce();
+    bounce(ofGetWidth(), ofGetHeight());
 }
 
 void BiggerFish::draw() const {
@@ -160,7 +160,7 @@ Aquarium::Aquarium(int width, int height, std::shared_ptr<AquariumSpriteManager>
 
 
 void Aquarium::addCreature(std::shared_ptr<Creature> creature) {
-    creature->setBounds(m_width - 20, m_height - 20);
+    creature->setBounds(m_width - 50, m_height - 50);
     m_creatures.push_back(creature);
 }
 

@@ -11,8 +11,43 @@ void Creature::normalize() {
     }
 }
 
-void Creature::bounce() {
+void Creature::bounce(float Width, float Height) {
     // should implement boundary controls here
+    if(m_x <= 0 || m_x >= Width - 50){
+
+         m_dx *= -1;
+         m_x -= 10;
+        
+         if (m_x <= 0){
+            m_x += 10;
+        }
+        else{
+            m_x -= 10;
+        }
+
+        m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+        m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
+        
+    }
+
+    if(m_y <= 0 || m_y  >= Height - 50){
+
+         m_dy *= -1;
+
+        if (m_y <= 0){
+            m_y += 10;
+        }
+        else{
+        m_y -= 10;
+        }
+
+        m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+        m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
+    }
+
+    
+   //cout<<(m_width) <<"   +   "<<Width<<endl;
+   normalize();
 }
 
 
