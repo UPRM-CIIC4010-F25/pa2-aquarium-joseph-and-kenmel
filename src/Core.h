@@ -99,7 +99,7 @@ public:
 
     void setBounds(int w, int h);
     void normalize();
-    void bounce(float Width, float Height);
+    void bounce(float Width, float Height,int key, bool is_player);
 };
 
 // GameEvents

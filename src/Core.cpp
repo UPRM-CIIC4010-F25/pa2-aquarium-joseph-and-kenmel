@@ -11,38 +11,70 @@ void Creature::normalize() {
     }
 }
 
-void Creature::bounce(float Width, float Height) {
+void Creature::bounce(float Width, float Height,int key,bool is_player) {
     // should implement boundary controls here
     if(m_x <= 0 || m_x >= Width - 50){
 
-         m_dx *= -1;
-         m_x -= 10;
-        
-         if (m_x <= 0){
+
+        if (is_player && ( key == OF_KEY_LEFT|| m_x <= 0)){
+            m_dx = 0;
             m_x += 10;
         }
-        else{
+        if (is_player && (key == OF_KEY_RIGHT || m_x >= Width-50) ){
+            m_dx = 0;
+            m_x-= 10;
+            
+        }
+        if (!is_player){
+        
+         m_dx *= -1;    
+        
+        
+         if (m_x <= 0 ){
+            m_x += 50;
+              m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+              m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
+        }
+        else if( m_x >= Width - 50 ){
             m_x -= 10;
+              m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+              m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
         }
 
-        m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
-        m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
-        
+      
+    }
     }
 
     if(m_y <= 0 || m_y  >= Height - 50){
 
-         m_dy *= -1;
-
-        if (m_y <= 0){
+        if (is_player && (key == OF_KEY_UP || m_y <= 0)){
+            m_dy = 0;
             m_y += 10;
+             
         }
-        else{
+        if (is_player && (key == OF_KEY_DOWN || m_y >= Height -50)){
+            m_dy = 0;
+            m_y -= 10;
+           
+        }
+        if(!is_player){
+
+         m_dy *= -1;
+      
+
+        if (m_y <= 0 ){
+            m_y += 50;
+              m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+              m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
+        }
+        else if ( m_y >= Height - 50 ){
         m_y -= 10;
+          m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+          m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
         }
 
-        m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
-        m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
+        
+    }
     }
 
     

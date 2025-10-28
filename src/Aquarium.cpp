@@ -27,7 +27,8 @@ void PlayerCreature::setDirection(float dx, float dy) {
 void PlayerCreature::move() {
     m_x += m_dx * m_speed;
     m_y += m_dy * m_speed;
-    //this->bounce(ofGetWidth(), ofGetHeight());
+    this->bounce(ofGetWidth(), ofGetHeight(),ofGetKeyPressed(),true);
+    cout<<m_x << " "<< m_y<< endl;
 }
 
 void PlayerCreature::reduceDamageDebounce() {
@@ -90,7 +91,7 @@ void NPCreature::move() {
     }else {
         this->m_sprite->setFlipped(false);
     }
-    bounce(ofGetWidth(), ofGetHeight());
+    bounce(ofGetWidth(), ofGetHeight(),ofGetKeyPressed(),false);
 }
 
 void NPCreature::draw() const {
@@ -123,7 +124,7 @@ void BiggerFish::move() {
         this->m_sprite->setFlipped(false);
     }
 
-    bounce(ofGetWidth(), ofGetHeight());
+    bounce(ofGetWidth(), ofGetHeight(),ofGetKeyPressed(),false);
 }
 
 void BiggerFish::draw() const {
