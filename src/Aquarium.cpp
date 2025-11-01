@@ -18,6 +18,7 @@ PlayerCreature::PlayerCreature(float x, float y, int speed, std::shared_ptr<Game
 : Creature(x, y, speed, 10.0f, 1, sprite) {}
 
 
+
 void PlayerCreature::setDirection(float dx, float dy) {
     m_dx = dx;
     m_dy = dy;
@@ -28,7 +29,8 @@ void PlayerCreature::move() {
     m_x += m_dx * m_speed;
     m_y += m_dy * m_speed;
     this->bounce(ofGetWidth(), ofGetHeight(),ofGetKeyPressed(),true);
-    cout<<m_x << " "<< m_y<< endl;
+    evolve();
+    //cout<<m_x << " "<< m_y<< endl;
 }
 
 void PlayerCreature::reduceDamageDebounce() {

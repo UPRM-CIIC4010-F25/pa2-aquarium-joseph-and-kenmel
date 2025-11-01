@@ -48,6 +48,16 @@ class PlayerCreature : public Creature {
 public:
 
     PlayerCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite);
+    
+    void evolve() {
+    if (getFishType() == NORMAL && getScore() >= 10) {
+        setFishType(RED);
+        m_sprite = std::make_shared<GameSprite>("red-fish.png", 70, 70);
+    } else if (getFishType() == RED && getScore() >= 20) {
+        setFishType(GREEN);
+        m_sprite = std::make_shared<GameSprite>("green-fish.png", 70, 70);
+    }
+}
     void move();
     void draw() const;
     void update();
