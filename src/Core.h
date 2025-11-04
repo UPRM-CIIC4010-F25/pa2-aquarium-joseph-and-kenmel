@@ -50,9 +50,16 @@ private:
 };
 
 
+enum FishType {
+    NORMAL,
+    RED,
+    GREEN,
+    ORANGE
+};
 
 class Creature {
 protected:
+    FishType m_fishType = NORMAL;
     Creature(float x, float y, int speed, float collisionRadius, int value,
              std::shared_ptr<GameSprite> sprite)
     : m_x(x)
@@ -78,6 +85,8 @@ protected:
     std::shared_ptr<GameSprite> m_sprite;
 
 public:
+    FishType getFishType() const { return m_fishType; }
+    void setFishType(FishType type) { m_fishType = type; }
     virtual ~Creature() = default;
     virtual void move() = 0;
     virtual void draw() const = 0;
