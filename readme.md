@@ -24,8 +24,8 @@ Grading
 ## Team Info
 | Student Number | Student Name | Student Email |
 |-|-|-|
-|(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
-|(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
+|(841-23-6171)| (Kenmel González Rivera)| (kenmel.gonzalez@upr.edu) |
+|(841-23-3649)| (Joseph Rivera Rawlins)| (joseph.rivera34@upr.edu) |
 
 ---
 

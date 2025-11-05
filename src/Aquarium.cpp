@@ -6,6 +6,10 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
     switch(t){
         case AquariumCreatureType::BiggerFish:
             return "BiggerFish";
+        case AquariumCreatureType::RedFish:
+            return "RedFish";
+        case AquariumCreatureType::GreenFish:
+            return "GreenFish";
         case AquariumCreatureType::NPCreature:
             return "BaseFish";
         default:
@@ -138,16 +142,26 @@ void BiggerFish::draw() const {
 // AquariumSpriteManager
 AquariumSpriteManager::AquariumSpriteManager(){
     this->m_npc_fish = std::make_shared<GameSprite>("base-fish.png", 70,70);
+    this->m_red_fish = std::make_shared<GameSprite>("red-fish.png", 70,70);
+    this->m_green_fish = std::make_shared<GameSprite>("green-fish.png", 70,70);
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
     switch(t){
-        case AquariumCreatureType::BiggerFish:
-            return std::make_shared<GameSprite>(*this->m_big_fish);
             
         case AquariumCreatureType::NPCreature:
             return std::make_shared<GameSprite>(*this->m_npc_fish);
+
+        case AquariumCreatureType::RedFish:
+            return std::make_shared<GameSprite>(*this->m_red_fish);
+        
+        case AquariumCreatureType::GreenFish:
+            return std::make_shared<GameSprite>(*this->m_green_fish);
+        
+        case AquariumCreatureType::BiggerFish:
+            return std::make_shared<GameSprite>(*this->m_big_fish);
+
         default:
             return nullptr;
     }
@@ -219,6 +233,14 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
         case AquariumCreatureType::NPCreature:
             this->addCreature(std::make_shared<NPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::NPCreature)));
             break;
+        case AquariumCreatureType::RedFish:
+            this->addCreature(std::make_shared<RedFish>(x, y, speed, m_sprite_manager->GetSprite(AquariumCreatureType::RedFish)));
+            break;
+
+        case AquariumCreatureType::GreenFish:
+            this->addCreature(std::make_shared<GreenFish>(x, y, speed, m_sprite_manager->GetSprite(AquariumCreatureType::GreenFish)));
+            break;
+
         case AquariumCreatureType::BiggerFish:
             this->addCreature(std::make_shared<BiggerFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::BiggerFish)));
             break;
@@ -282,29 +304,88 @@ void AquariumGameScene::Update(){
 
     this->m_player->update();
 
+    if (!powerUpActive && ofGetElapsedTimeMillis() >= nextPowerUpTime) {
+        powerUpX = 50 + rand() % (ofGetWidth() - 100);
+        powerUpY = 50 + rand() % (ofGetHeight() - 100);
+        powerUpActive = true;
+}
+    if (powerUpActive) {
+    float dx = m_player->getX() - powerUpX;
+    float dy = m_player->getY() - powerUpY;
+    float distance = sqrt(dx * dx + dy * dy);
+    if (distance <= (m_player->getCollisionRadius() + powerUpRadius)) {
+        beforePowerUpType = m_player->getFishType();
+        m_player->setFishType(ORANGE);
+        m_player->setSprite(std::make_shared<GameSprite>("bigger-fish.png",70,70));
+        powerUpActive = false;
+        powerUpEnabled = true;
+        powerUpEndTime = ofGetElapsedTimeMillis() + 5000; // 5 segundos
+        nextPowerUpTime = ofGetElapsedTimeMillis() + 20000 + rand() % 10000; // 20-30s
+    }
+}
+
+    if (powerUpEnabled && ofGetElapsedTimeMillis() >= powerUpEndTime) {
+    int score = m_player->getScore();
+    // Cambia según tu lógica de evolución:
+    if (score < 10) {
+        m_player->setFishType(NORMAL);
+        m_player->setSprite(std::make_shared<GameSprite>("base-fish.png",70,70));
+    } else if (score < 20) {
+        m_player->setFishType(RED);
+        m_player->setSprite(std::make_shared<GameSprite>("red-fish.png",70,70));
+    } else if (score < 30) {
+        m_player->setFishType(GREEN);
+        m_player->setSprite(std::make_shared<GameSprite>("green-fish.png",70,70));
+    } else {
+        m_player->setFishType(GREEN);
+        m_player->setSprite(std::make_shared<GameSprite>("green-fish.png",70,70));
+    }
+    powerUpEnabled = false; // ¡Este booleano debe resetearse siempre!
+}
+
+   
     if (this->updateControl.tick()) {
         event = DetectAquariumCollisions(this->m_aquarium, this->m_player);
         if (event != nullptr && event->isCollisionEvent()) {
             ofLogVerbose() << "Collision detected between player and NPC!" << std::endl;
             if(event->creatureB != nullptr){
                 event->print();
-                if(this->m_player->getPower() < event->creatureB->getValue()){
-                    ofLogNotice() << "Player is too weak to eat the creature!" << std::endl;
-                    this->m_player->loseLife(3*60); // 3 frames debounce, 3 seconds at 60fps
-                    if(this->m_player->getLives() <= 0){
-                        this->m_lastEvent = std::make_shared<GameEvent>(GameEventType::GAME_OVER, this->m_player, nullptr);
-                        return;
-                    }
+                
+            auto npcB = std::dynamic_pointer_cast<NPCreature>(event->creatureB);
+            AquariumCreatureType fishTypeB;
+            if (npcB) {
+            fishTypeB = npcB->GetType();
+            } else {
+            }
+            auto playerType = m_player->getFishType();
+
+            bool puedeComer = false;
+            if (playerType == ORANGE)
+                puedeComer = true;
+            else if (fishTypeB == AquariumCreatureType::NPCreature && playerType >= NORMAL)
+                puedeComer = true;
+            else if (fishTypeB == AquariumCreatureType::RedFish && playerType >= RED)
+                puedeComer = true;
+            else if (fishTypeB == AquariumCreatureType::GreenFish && playerType >= GREEN)
+                puedeComer = true;
+            // BiggerFish, no se puede comer sin power ups
+
+            if (puedeComer) {
+                this->m_aquarium->removeCreature(event->creatureB);
+                this->m_player->addToScore(1, event->creatureB->getValue());
+                // Puedes mantener aquí los efectos de power up si quieres
+                // if (this->m_player->getScore() % 25 == 0) { ... }
+            } else {
+                ofLogNotice() << "Player is too weak to eat the creature!" << std::endl;
+                this->m_player->loseLife(3*60);
+                if(this->m_player->getLives() <= 0){
+                    this->m_lastEvent = std::make_shared<GameEvent>(GameEventType::GAME_OVER, this->m_player, nullptr);
+                    return;
                 }
-                else{
-                    this->m_aquarium->removeCreature(event->creatureB);
-                    this->m_player->addToScore(1, event->creatureB->getValue());
-                    if (this->m_player->getScore() % 25 == 0){
-                        this->m_player->increasePower(1);
-                        ofLogNotice() << "Player power increased to " << this->m_player->getPower() << "!" << std::endl;
-                    }
+            }
+
                     
-                }
+                
                 
                 
 
@@ -320,6 +401,11 @@ void AquariumGameScene::Update(){
 }
 
 void AquariumGameScene::Draw() {
+    if (powerUpActive) {
+    ofSetColor(255); // Blanco
+    ofDrawCircle(powerUpX, powerUpY, powerUpRadius);
+    ofSetColor(255,255,255); // Reset color para otras entidades
+}
     this->m_player->draw();
     this->m_aquarium->draw();
     this->paintAquariumHUD();
@@ -399,6 +485,20 @@ std::vector<AquariumCreatureType> Level_1::Repopulate() {
 }
 
 std::vector<AquariumCreatureType> Level_2::Repopulate() {
+    std::vector<AquariumCreatureType> toRepopulate;
+    for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
+        int delta = node->population - node->currentPopulation;
+        if(delta >0){
+            for(int i=0; i<delta; i++){
+                toRepopulate.push_back(node->creatureType);
+            }
+            node->currentPopulation += delta;
+        }
+    }
+    return toRepopulate;
+}
+
+std::vector<AquariumCreatureType> Level_3::Repopulate() {
     std::vector<AquariumCreatureType> toRepopulate;
     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
         int delta = node->population - node->currentPopulation;

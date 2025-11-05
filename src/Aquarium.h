@@ -9,7 +9,9 @@
 
 enum class AquariumCreatureType {
     NPCreature,
-    BiggerFish
+    BiggerFish,
+    RedFish,
+    GreenFish
 };
 
 string AquariumCreatureTypeToString(AquariumCreatureType t);
@@ -50,13 +52,14 @@ public:
     PlayerCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite);
     
     void evolve() {
-    if (getFishType() == NORMAL && getScore() >= 10) {
+   
+    if (getFishType() == NORMAL && getScore() >= 15) {
         setFishType(RED);
         m_sprite = std::make_shared<GameSprite>("red-fish.png", 70, 70);
-    } else if (getFishType() == RED && getScore() >= 20) {
+    } else if (getFishType() == RED && getScore() >= 55) {
         setFishType(GREEN);
         m_sprite = std::make_shared<GameSprite>("green-fish.png", 70, 70);
-    }
+    } 
 }
     void move();
     void draw() const;
@@ -95,6 +98,28 @@ protected:
     AquariumCreatureType m_creatureType;
 
 };
+class RedFish : public NPCreature {
+public:
+    RedFish(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
+    : NPCreature(x, y, speed, sprite) {
+        setCollisionRadius(20); 
+        m_value = 2;
+        m_creatureType = AquariumCreatureType::RedFish;
+    }
+   
+};
+
+class GreenFish : public NPCreature {
+public:
+    GreenFish(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
+    : NPCreature(x, y, speed, sprite) {
+        setCollisionRadius(20); 
+        m_value = 3;
+        m_creatureType = AquariumCreatureType::GreenFish;
+    }
+   
+};
+
 
 class BiggerFish : public NPCreature {
 public:
@@ -111,6 +136,8 @@ class AquariumSpriteManager {
         std::shared_ptr<GameSprite>GetSprite(AquariumCreatureType t);
     private:
         std::shared_ptr<GameSprite> m_npc_fish;
+        std::shared_ptr<GameSprite> m_red_fish;
+        std::shared_ptr<GameSprite> m_green_fish;
         std::shared_ptr<GameSprite> m_big_fish;
 };
 
@@ -152,8 +179,14 @@ std::shared_ptr<GameEvent> DetectAquariumCollisions(std::shared_ptr<Aquarium> aq
 
 class AquariumGameScene : public GameScene {
     public:
+
+        
+
         AquariumGameScene(std::shared_ptr<PlayerCreature> player, std::shared_ptr<Aquarium> aquarium, string name)
-        : m_player(std::move(player)) , m_aquarium(std::move(aquarium)), m_name(name){}
+        : m_player(std::move(player)) , m_aquarium(std::move(aquarium)), m_name(name){
+
+        nextPowerUpTime = ofGetElapsedTimeMillis() + 20000 + rand() % 10000;
+        }
         std::shared_ptr<GameEvent> GetLastEvent(){return m_lastEvent;}
         void SetLastEvent(std::shared_ptr<GameEvent> event){this->m_lastEvent = event;}
         std::shared_ptr<PlayerCreature> GetPlayer(){return this->m_player;}
@@ -164,6 +197,13 @@ class AquariumGameScene : public GameScene {
     private:
         void paintAquariumHUD();
         std::shared_ptr<PlayerCreature> m_player;
+        bool powerUpActive = false;
+        bool powerUpEnabled = false;
+        float powerUpX = 0, powerUpY = 0;
+        float powerUpRadius = 25;
+        uint64_t nextPowerUpTime = 0;
+        uint64_t powerUpEndTime = 0; // <-- Nueva variable
+        FishType beforePowerUpType; 
         std::shared_ptr<Aquarium> m_aquarium;
         std::shared_ptr<GameEvent> m_lastEvent;
         string m_name;
@@ -184,6 +224,7 @@ class Level_1 : public AquariumLevel  {
     public:
         Level_1(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 20));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::RedFish, 10));
 
         };
         std::vector<AquariumCreatureType> Repopulate() override;
@@ -193,7 +234,17 @@ class Level_1 : public AquariumLevel  {
 class Level_2 : public AquariumLevel  {
     public:
         Level_2(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
-            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 30));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::RedFish, 25));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::GreenFish, 8));
+
+        };
+        std::vector<AquariumCreatureType> Repopulate() override;
+
+};
+class Level_3 : public AquariumLevel  {
+    public:
+        Level_3(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::GreenFish, 30));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 5));
 
         };
