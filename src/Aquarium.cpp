@@ -138,11 +138,33 @@ void BiggerFish::draw() const {
     this->m_sprite->draw(this->m_x, this->m_y);
 }
 
+void GreenFish::move() {
+    
+    NPCreature::move();
+
+    m_dx += ((rand() % 10) - (rand() % 10)) / 10.0f;
+    m_dy += ((rand() % 10) - (rand() % 10)) / 10.0f;
+}
+    
+void RedFish::move() {
+    
+    NPCreature::move();
+    m_x += m_dx * (m_speed * 1.3); // Moves faster
+    m_y += m_dy * (m_speed * 1.3);
+
+    if(m_dx < 0 ){
+        this->m_sprite->setFlipped(true);
+    }else {
+        this->m_sprite->setFlipped(false);
+    }
+   
+}
+ 
 
 // AquariumSpriteManager
 AquariumSpriteManager::AquariumSpriteManager(){
     this->m_npc_fish = std::make_shared<GameSprite>("base-fish.png", 70,70);
-    this->m_red_fish = std::make_shared<GameSprite>("red-fish.png", 70,70);
+    this->m_red_fish = std::make_shared<GameSprite>("red-fish.png", 60,60);
     this->m_green_fish = std::make_shared<GameSprite>("green-fish.png", 70,70);
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
 }
@@ -319,28 +341,25 @@ void AquariumGameScene::Update(){
         m_player->setSprite(std::make_shared<GameSprite>("bigger-fish.png",70,70));
         powerUpActive = false;
         powerUpEnabled = true;
-        powerUpEndTime = ofGetElapsedTimeMillis() + 5000; // 5 segundos
-        nextPowerUpTime = ofGetElapsedTimeMillis() + 20000 + rand() % 10000; // 20-30s
+        powerUpEndTime = ofGetElapsedTimeMillis() + 10000; // 5 segundos
+        nextPowerUpTime = ofGetElapsedTimeMillis() + 30000 + rand() % 20000; // 20-30s
     }
 }
 
     if (powerUpEnabled && ofGetElapsedTimeMillis() >= powerUpEndTime) {
     int score = m_player->getScore();
     // Cambia según tu lógica de evolución:
-    if (score < 10) {
+    if (score < 15) {
         m_player->setFishType(NORMAL);
         m_player->setSprite(std::make_shared<GameSprite>("base-fish.png",70,70));
-    } else if (score < 20) {
+    } else if (score < 55) {
         m_player->setFishType(RED);
         m_player->setSprite(std::make_shared<GameSprite>("red-fish.png",70,70));
-    } else if (score < 30) {
+    } else if (score >= 55) {
         m_player->setFishType(GREEN);
         m_player->setSprite(std::make_shared<GameSprite>("green-fish.png",70,70));
-    } else {
-        m_player->setFishType(GREEN);
-        m_player->setSprite(std::make_shared<GameSprite>("green-fish.png",70,70));
-    }
-    powerUpEnabled = false; // ¡Este booleano debe resetearse siempre!
+    } 
+    powerUpEnabled = false; 
 }
 
    
@@ -373,8 +392,7 @@ void AquariumGameScene::Update(){
             if (puedeComer) {
                 this->m_aquarium->removeCreature(event->creatureB);
                 this->m_player->addToScore(1, event->creatureB->getValue());
-                // Puedes mantener aquí los efectos de power up si quieres
-                // if (this->m_player->getScore() % 25 == 0) { ... }
+               
             } else {
                 ofLogNotice() << "Player is too weak to eat the creature!" << std::endl;
                 this->m_player->loseLife(3*60);

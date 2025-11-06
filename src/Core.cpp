@@ -13,6 +13,8 @@ void Creature::normalize() {
 
 void Creature::bounce(float Width, float Height,int key,bool is_player) {
     // should implement boundary controls here
+
+   
     if(m_x <= 0 || m_x >= Width - 50){
 
 
@@ -76,6 +78,16 @@ void Creature::bounce(float Width, float Height,int key,bool is_player) {
         
     }
     }
+
+if (!is_player) {
+    // Detectar si está casi quieto 
+    if (fabs(m_dx) < 0.5f && fabs(m_dy) < 0.5f) { //fabs me devuelve el valor absoluto de un float
+        // velocidad nueva para reactivarlo
+        m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
+        m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
+
+    }
+}
 
     
    //cout<<(m_width) <<"   +   "<<Width<<endl;
