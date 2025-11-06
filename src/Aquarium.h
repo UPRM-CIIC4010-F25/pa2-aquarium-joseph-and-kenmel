@@ -204,7 +204,7 @@ class AquariumGameScene : public GameScene {
         float powerUpX = 0, powerUpY = 0;
         float powerUpRadius = 25;
         uint64_t nextPowerUpTime = 0;
-        uint64_t powerUpEndTime = 0; // <-- Nueva variable
+        uint64_t powerUpEndTime = 0; 
         FishType beforePowerUpType; 
         std::shared_ptr<Aquarium> m_aquarium;
         std::shared_ptr<GameEvent> m_lastEvent;

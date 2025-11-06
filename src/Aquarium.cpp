@@ -141,7 +141,7 @@ void BiggerFish::draw() const {
 void GreenFish::move() {
     
     NPCreature::move();
-
+    // Add some random movement
     m_dx += ((rand() % 10) - (rand() % 10)) / 10.0f;
     m_dy += ((rand() % 10) - (rand() % 10)) / 10.0f;
 }

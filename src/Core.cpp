@@ -80,9 +80,9 @@ void Creature::bounce(float Width, float Height,int key,bool is_player) {
     }
 
 if (!is_player) {
-    // Detectar si está casi quieto 
-    if (fabs(m_dx) < 0.5f && fabs(m_dy) < 0.5f) { //fabs me devuelve el valor absoluto de un float
-        // velocidad nueva para reactivarlo
+    // Detect if is stuck 
+    if (fabs(m_dx) < 0.5f && fabs(m_dy) < 0.5f) { //fabs returns absolute value of a float
+        // new speed to get unstuck
         m_dx += ((rand() % 10) - (rand() % 10))/10.0f;
         m_dy += ((rand() % 10) - (rand() % 10))/10.0f;
 
